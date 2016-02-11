@@ -12,6 +12,12 @@ function initializePage() {
 	$('.project a').click(addProjectDetails);
 
 	$('#colorBtn').click(randomizeColors);
+	$.get('http://api.wefeelfine.org:8080/ShowFeelings?display=xml&returnfields=sentence&limit=50', handleAPI, 'jsonp')
+}
+
+function handleAPI(result){
+	console.log(result);
+	//$("#external-api").html(result);
 }
 
 /*
@@ -27,6 +33,8 @@ function addProjectDetails(e) {
 	var idNumber = projectID.substr('project'.length);
 
 	console.log("User clicked on project " + idNumber);
+
+	$.get("/project/" + idNumber, handleResult);
 }
 
 /*
@@ -35,4 +43,23 @@ function addProjectDetails(e) {
  */
 function randomizeColors(e) {
 	console.log("User clicked on color button");
+	$.get("/palette", handleColor);
+}
+
+function handleColor(result){
+	console.log(result['colors']['hex']);
+	var colors = result['colors']['hex'];
+	$('body').css('background-color', colors[0]);
+	$('.thumbnail').css('background-color', colors[1]);
+	$('h1, h2, h3, h4, h5, h5').css('color', colors[2]);
+	$('p').css('color', colors[3]);
+	$('.project img').css('opacity', .75);
+}
+
+function handleResult(result){
+	console.log(result);
+	//console.log("#" + result['id'] + " .details");
+	var htmlString = "<img class='detailsImage' src='" + result['image'] + "'/>"
+					+ "<h3>" + result['title'] + "</h3> <h5><em>" + result['date'] + "</em></h5>"+result['summary'];
+	$("#project" + result['id'] + " .details").html(htmlString);
 }
